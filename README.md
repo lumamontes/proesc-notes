@@ -1,4 +1,6 @@
-# ProEsc Notes - A Modern PWA Note-Taking App
+<img width="1920" height="1055" alt="image" src="https://github.com/user-attachments/assets/6dc938cb-b077-4ee0-86c7-3c94409b0119" />
+
+# Proesc Notes - A Modern PWA Note-Taking App
 
 This is a modern note-taking application built with a focus on exploring and implementing cutting-edge web technologies. The primary goal of this project was to serve as a learning playground for creating a robust, offline-first Progressive Web App (PWA) using a modern tech stack.
 
@@ -72,7 +74,7 @@ Follow these instructions to get a copy of the project up and running on your lo
 1.  **Clone the repository:**
     ```bash
     git clone https://github.com/lumamontes/proesc-notes.git
-    cd proesc-notes-web
+    cd proesc-notes
     ```
 
 2.  **Install PHP dependencies:**
