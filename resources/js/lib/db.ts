@@ -11,9 +11,7 @@ db.version(1).stores({
   notes: 'id, title, content, created_at, updated_at, synced, user_id',
 });
 
-// Notes service for offline operations
 export class NotesService {
-  // Get all notes for the current user, sorted by updated_at descending
   static async getAllNotes(userId?: number): Promise<Note[]> {
     if (userId) {
       const notes = await db.notes
@@ -26,12 +24,10 @@ export class NotesService {
     return notes.sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime());
   }
 
-  // Get a specific note by ID
   static async getNote(id: string): Promise<Note | undefined> {
     return await db.notes.get(id);
   }
 
-  // Create a new note
   static async createNote(note: Omit<Note, 'id' | 'created_at' | 'updated_at' | 'synced'>): Promise<Note> {
     const now = new Date().toISOString();
     const newNote: Note = {
@@ -46,7 +42,6 @@ export class NotesService {
     return newNote;
   }
 
-  // Update an existing note
   static async updateNote(id: string, updates: Partial<Omit<Note, 'id' | 'created_at'>>): Promise<Note | undefined> {
     const existingNote = await db.notes.get(id);
     if (!existingNote) return undefined;
@@ -62,15 +57,12 @@ export class NotesService {
     return updatedNote;
   }
 
-  // Delete a note
   static async deleteNote(id: string): Promise<void> {
     await db.notes.delete(id);
   }
 
-  // Delete a note from both local and backend
   static async deleteNoteFromBackend(id: string): Promise<void> {
     try {
-      // Delete from backend first
       const response = await fetch(`/api/notes/${id}`, {
         method: 'DELETE',
         credentials: 'same-origin',
@@ -81,7 +73,6 @@ export class NotesService {
       });
 
       if (response.ok) {
-        // Delete from local database
         await this.deleteNote(id);
         console.log('Note deleted from backend and local storage');
       } else {
@@ -95,37 +86,30 @@ export class NotesService {
     }
   }
 
-  // Get unsynced notes (for sync with backend)
   static async getUnsyncedNotes(): Promise<Note[]> {
     return await db.notes.filter(note => !note.synced).toArray();
   }
 
-  // Mark notes as synced
   static async markAsSynced(noteIds: string[]): Promise<void> {
     await db.notes.where('id').anyOf(noteIds).modify({ synced: true });
   }
 
-  // Clear all notes (useful for logout)
   static async clearNotes(): Promise<void> {
     await db.notes.clear();
   }
 
-  // Get CSRF token from meta tag
   private static getCsrfToken(): string {
     const metaTag = document.querySelector('meta[name="csrf-token"]');
     return metaTag ? metaTag.getAttribute('content') || '' : '';
   }
 
-  // Sync notes with backend
   static async syncWithBackend(userId: number): Promise<void> {
     try {
       console.log('Starting sync with backend...');
       
-      // Get unsynced notes
       const unsyncedNotes = await this.getUnsyncedNotes();
       console.log('Unsynced notes:', unsyncedNotes.length);
       
-      // Send unsynced notes to backend
       if (unsyncedNotes.length > 0) {
         console.log('Sending unsynced notes to backend...');
         
@@ -155,7 +139,6 @@ export class NotesService {
         }
       }
 
-      // Fetch latest notes from backend
       console.log('Fetching notes from backend...');
       const response = await fetch('/api/notes', {
         credentials: 'same-origin',
@@ -171,7 +154,6 @@ export class NotesService {
         const backendNotes: Note[] = await response.json();
         console.log('Backend notes received:', backendNotes.length);
         
-        // Update local database with backend notes
         for (const note of backendNotes) {
           const localNote = await db.notes.get(note.id);
           if (!localNote || new Date(note.updated_at) > new Date(localNote.updated_at)) {

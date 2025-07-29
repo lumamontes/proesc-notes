@@ -27,9 +27,12 @@ export function UserMenuContent({ user }: UserMenuContentProps) {
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
           <DropdownMenuGroup>
-                <DropdownMenuItem asChild>
-                <AppearanceTabs />
-                </DropdownMenuItem>
+                <div className="px-2 py-1.5">
+                    <div className="mb-1 text-xs font-medium text-neutral-500 dark:text-neutral-400">
+                        Appearance
+                    </div>
+                    <AppearanceTabs className="w-full" />
+                </div>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>

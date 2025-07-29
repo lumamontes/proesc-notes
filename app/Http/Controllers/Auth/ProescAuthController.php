@@ -14,12 +14,12 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
-class LegacyAuthController extends Controller
+class ProescAuthController extends Controller
 {
     /**
      * Handle legacy authentication attempt
      */
-    public function attemptLegacy(Request $request): JsonResponse
+    public function attemptProesc(Request $request): JsonResponse
     {
         $request->validate([
             'email' => 'required|string|email',
@@ -28,8 +28,7 @@ class LegacyAuthController extends Controller
         ]);
 
         try {
-            // Make request to legacy endpoint
-            $response = Http::post(config('app.legacy_api_url') . '/login_suporte/', [
+            $response = Http::post(config('app.proesc_url') . '/login_suporte/', [
                 'email' => $request->email,
                 'password' => $request->password,
                 'acesso_aplicativo' => $request->boolean('acesso_aplicativo', true),
@@ -39,18 +38,14 @@ class LegacyAuthController extends Controller
             if ($response->successful()) {
                 $data = $response->json();
                 
-                // Debug: Log the response structure
                 Log::info('Legacy auth response:', $data);
                 
                 if ($data['status'] === 'success') {
-                    // Find or create user in local database
                     $user = $this->findOrCreateUser($data['person']);
                     
-                    // Authenticate the user with Laravel
                     Auth::login($user, $request->boolean('remember', false));
                     
-                    // Store legacy user data in session for additional info
-                    Session::put('legacy_user_data', $data['person']);
+                    Session::put('proesc_user_data', $data['person']);
                     
                     return response()->json([
                         'status' => 'success',
@@ -82,7 +77,6 @@ class LegacyAuthController extends Controller
      */
     private function findOrCreateUser($legacyUserData): User
     {
-        // Handle different possible field names for email
         $email = $legacyUserData['email'] ?? $legacyUserData['email_suporte'] ?? $legacyUserData['email_comunicacao'] ?? null;
         
         if (!$email) {
@@ -92,14 +86,12 @@ class LegacyAuthController extends Controller
         $user = User::where('email', $email)->first();
         
         if (!$user) {
-            // Create new user from legacy data
             $user = User::create([
                 'name' => $legacyUserData['name'] ?? $legacyUserData['nome'] ?? $email,
                 'email' => $email,
-                'password' => Hash::make(Str::random(16)), // Random password since we don't have it
+                'password' => Hash::make(Str::random(16)),
             ]);
         } else {
-            // Update existing user with latest legacy data
             $user->update([
                 'name' => $legacyUserData['name'] ?? $legacyUserData['nome'] ?? $email,
             ]);
@@ -111,11 +103,11 @@ class LegacyAuthController extends Controller
     /**
      * Check if user is authenticated via legacy system
      */
-    public function checkLegacyAuth(): JsonResponse
+    public function checkProescAuth(): JsonResponse
     {
         if (Auth::check()) {
             $user = Auth::user();
-            $legacyData = Session::get('legacy_user_data');
+            $legacyData = Session::get('proesc_user_data');
             
             return response()->json([
                 'status' => 'success',
@@ -134,10 +126,10 @@ class LegacyAuthController extends Controller
     /**
      * Logout from legacy system
      */
-    public function logoutLegacy(Request $request): JsonResponse
+    public function logoutProesc(Request $request): JsonResponse
     {
         Auth::logout();
-        Session::forget(['legacy_user_data']);
+        Session::forget(['proesc_user_data']);
         $request->session()->invalidate();
         $request->session()->regenerateToken();
         

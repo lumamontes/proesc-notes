@@ -132,6 +132,6 @@ return [
     |
     */
 
-    'legacy_api_url' => env('LEGACY_API_URL', 'https://f2e4c675afd4.ngrok-free.app'),
+    'proesc_url' => env('proesc_url', 'https://f2e4c675afd4.ngrok-free.app'),
 
 ];

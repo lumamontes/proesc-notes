@@ -1,15 +1,13 @@
 <?php
 
-use App\Http\Controllers\Auth\LegacyAuthController;
+use App\Http\Controllers\Auth\ProescAuthController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('guest')->group(function () {
-    // Legacy authentication routes for support users
-    Route::post('login/legacy', [LegacyAuthController::class, 'attemptLegacy'])->name('login.legacy');
-    Route::get('auth/legacy/check', [LegacyAuthController::class, 'checkLegacyAuth'])->name('auth.legacy.check');
+    Route::post('login/proesc', [ProescAuthController::class, 'attemptProesc'])->name('login.proesc');
+    Route::get('auth/proesc/check', [ProescAuthController::class, 'checkProescAuth'])->name('auth.proesc.check');
 });
 
 Route::middleware('auth')->group(function () {
-    // Legacy logout route
-    Route::post('logout/legacy', [LegacyAuthController::class, 'logoutLegacy'])->name('logout.legacy');
+    Route::post('logout/proesc', [ProescAuthController::class, 'logoutProesc'])->name('logout.proesc');
 });

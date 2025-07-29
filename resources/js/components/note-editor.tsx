@@ -62,7 +62,7 @@ export default function NoteEditor({ note, onSave, onTitleChange, onContentChang
       setSaving(true);
       await onSave({ 
         title: title.trim() || 'Sem título', 
-        content: content.trim() || '<p>Nova anotação</p>' 
+        content: content.trim() || '' 
       });
       setHasUnsavedChanges(false);
     } catch (error) {
@@ -72,19 +72,16 @@ export default function NoteEditor({ note, onSave, onTitleChange, onContentChang
     }
   }, [onSave, title, content, saving]);
 
-  // Auto-save functionality with debouncing - only for existing notes and when not disabled
   useEffect(() => {
     if (!hasUnsavedChanges || saving || !note || disableAutoSave) return;
 
-    // Clear existing timeout
     if (autoSaveTimeout) {
       clearTimeout(autoSaveTimeout);
     }
 
-    // Set new timeout for auto-save
     const timeoutId = setTimeout(() => {
       handleSave();
-    }, 3000); // Auto-save after 3 seconds of inactivity
+    }, 3000);
 
     setAutoSaveTimeout(timeoutId);
 
@@ -93,7 +90,6 @@ export default function NoteEditor({ note, onSave, onTitleChange, onContentChang
     };
   }, [hasUnsavedChanges, handleSave, saving, note, disableAutoSave]);
 
-  // Keyboard shortcut for saving
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === 's') {

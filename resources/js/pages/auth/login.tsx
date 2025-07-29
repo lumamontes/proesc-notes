@@ -22,7 +22,7 @@ interface LoginProps {
     canResetPassword: boolean;
 }
 
-export default function Login({ status, canResetPassword }: LoginProps) {
+export default function Login({ status }: LoginProps) {
     const [legacyError, setLegacyError] = useState<string | null>(null);
     const [legacyProcessing, setLegacyProcessing] = useState(false);
     const [formData, setFormData] = useState<LoginForm>({
@@ -41,7 +41,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
         setLegacyError(null);
 
         try {
-            const response = await axios.post(route('login.legacy'), {
+            const response = await axios.post(route('login.proesc'), {
                 email: formData.email,
                 password: formData.password,
                 acesso_aplicativo: true,

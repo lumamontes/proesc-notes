@@ -66,14 +66,7 @@ export default function Dashboard({ user }: DashboardProps) {
             <PWAInstallPrompt />
 
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4 overflow-x-auto">
-                <div className="flex items-center justify-between">
-                    <div>
-                        <h1 className="text-2xl font-bold">Nova Anotação</h1>
-                        <p className="text-muted-foreground">
-                            Comece a escrever para criar uma nova anotação
-                        </p>
-                    </div>
-                    
+                <div className="flex items-center justify-end">
                     <Button
                         onClick={handleSave}
                         disabled={isCreatingNote || (!title.trim() && !content.trim())}

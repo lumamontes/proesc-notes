@@ -130,10 +130,7 @@ export default function TipTap({ initialContent = '', onContentChange, className
         spellcheck: 'true',
       },
     },
-    content: initialContent || `
-<h2>Nova Anotação</h2>
-<p>Comece a escrever suas ideias aqui...</p>
-`,
+    content: initialContent || '',
     onUpdate: ({ editor }) => {
       const html = editor.getHTML();
       onContentChange?.(html);

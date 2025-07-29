@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Download, X, Info, Zap } from 'lucide-react';
+import { Download, X, Info } from 'lucide-react';
 import { installPWA, isInstalled, checkPWACriteria } from '@/lib/pwa';
 
 export default function PWAInstallPrompt() {
@@ -12,17 +12,14 @@ export default function PWAInstallPrompt() {
   const [criteria, setCriteria] = useState<any>(null);
 
   useEffect(() => {
-    // Check PWA criteria
     const pwaCriteria = checkPWACriteria();
     setCriteria(pwaCriteria);
 
-    // Don't show if already installed
     if (isInstalled()) {
       console.log('PWA already installed, not showing prompt');
       return;
     }
 
-    // Listen for the beforeinstallprompt event
     const handleBeforeInstallPrompt = (e: Event) => {
       e.preventDefault();
       console.log('beforeinstallprompt event received');
@@ -30,7 +27,6 @@ export default function PWAInstallPrompt() {
       setShowPrompt(true);
     };
 
-    // Listen for the appinstalled event
     const handleAppInstalled = () => {
       console.log('appinstalled event received');
       setShowPrompt(false);
@@ -40,13 +36,12 @@ export default function PWAInstallPrompt() {
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
     window.addEventListener('appinstalled', handleAppInstalled);
 
-    // Show prompt after a delay if no beforeinstallprompt event
     const timer = setTimeout(() => {
       if (!deferredPrompt && !isInstalled()) {
         console.log('No beforeinstallprompt event, showing fallback prompt');
         setShowPrompt(true);
       }
-    }, 3000); // Reduced to 3 seconds
+    }, 3000);
 
     return () => {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
@@ -82,35 +77,12 @@ export default function PWAInstallPrompt() {
     }
   };
 
-  const handleForceInstall = async () => {
-    try {
-      setInstalling(true);
-      console.log('Force installing PWA...');
-      
-      // Try to trigger installation manually
-      if ('serviceWorker' in navigator) {
-        const registration = await navigator.serviceWorker.ready;
-        console.log('Service Worker ready:', registration);
-      }
-      
-      // Show instructions for manual installation
-      alert('Para instalar o app:\n\n1. Clique no ícone de instalação na barra de endereços\n2. Ou vá em Menu > Instalar app\n3. Ou use Ctrl+Shift+I > Application > Manifest > Install');
-      
-    } catch (error) {
-      console.error('Force installation failed:', error);
-    } finally {
-      setInstalling(false);
-    }
-  };
-
   const handleDismiss = () => {
     setShowPrompt(false);
     setDeferredPrompt(null);
-    // Don't show again for this session
     sessionStorage.setItem('pwa-prompt-dismissed', 'true');
   };
 
-  // Don't show if already dismissed in this session
   if (sessionStorage.getItem('pwa-prompt-dismissed') || !showPrompt) {
     return null;
   }
@@ -171,18 +143,6 @@ export default function PWAInstallPrompt() {
           >
             {installing ? 'Instalando...' : 'Instalar'}
           </Button>
-          {!criteria?.isInstallable && (
-            <Button
-              onClick={handleForceInstall}
-              disabled={installing}
-              size="sm"
-              variant="outline"
-              className="flex-1"
-            >
-              <Zap className="h-3 w-3 mr-1" />
-              Forçar
-            </Button>
-          )}
           <Button
             variant="outline"
             onClick={handleDismiss}
