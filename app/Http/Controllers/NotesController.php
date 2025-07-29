@@ -100,8 +100,6 @@ class NotesController extends Controller
             'notes.*.id' => 'required|string|uuid',
             'notes.*.title' => 'required|string|max:255',
             'notes.*.content' => 'required|string',
-            'notes.*.created_at' => 'required|date',
-            'notes.*.updated_at' => 'required|date',
         ]);
 
         Log::info('Syncing notes', ['count' => count($validated['notes'])]);
@@ -112,24 +110,22 @@ class NotesController extends Controller
             $existingNote = Auth::user()->notes()->where('id', $noteData['id'])->first();
 
             if ($existingNote) {
-                // Update if the incoming note is newer
-                if (strtotime($noteData['updated_at']) > strtotime($existingNote->updated_at)) {
+                if (strtotime(now()) > strtotime($existingNote->updated_at)) {
                     $existingNote->update([
                         'title' => $noteData['title'],
                         'content' => $noteData['content'],
-                        'updated_at' => $noteData['updated_at'],
+                        'updated_at' => now(),
                     ]);
                     $syncedNotes[] = $existingNote;
                     Log::info('Note updated during sync', ['note_id' => $existingNote->id]);
                 }
             } else {
-                // Create new note
                 $newNote = Auth::user()->notes()->create([
                     'id' => $noteData['id'],
                     'title' => $noteData['title'],
                     'content' => $noteData['content'],
-                    'created_at' => $noteData['created_at'],
-                    'updated_at' => $noteData['updated_at'],
+                    'created_at' => now(),
+                    'updated_at' => now(),
                 ]);
                 $syncedNotes[] = $newNote;
                 Log::info('Note created during sync', ['note_id' => $newNote->id]);

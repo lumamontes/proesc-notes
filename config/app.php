@@ -125,13 +125,14 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Legacy API Configuration
+    | Proesc Configuration
     |--------------------------------------------------------------------------
     |
-    | Configuration for legacy PHP application integration
+    | Configuration for Proesc application integration
+    | This is the URL of the legacy Proesc application 
     |
     */
 
-    'proesc_url' => env('proesc_url', 'https://f2e4c675afd4.ngrok-free.app'),
+    'proesc_url' => env('proesc_url', 'https://2705533ef847.ngrok-free.app'),
 
 ];
